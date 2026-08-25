@@ -5,8 +5,9 @@
  *       渲染引擎(render.js/render.css)在模板里绘出节点图。
  * 关键 API：api.originEntity = 承载 ~renderNote 的那个渲染笔记(当前蓝图记录)
  *          api.currentNote    = 本脚本所在笔记（__FILE__），用于上溯定位资产库
- * 资产来源：优先从 库书上的 #renderAssetsDir 指向的本地目录读取
- *          （fs），否则回退读取 蓝图渲染资产 子笔记内容。
+ * 资产来源：优先从 库书上的 #renderAssetsDir 指向的本地目录读取（fs），
+ *          否则回退读取 蓝图渲染资产 子笔记内容。
+ * 交互：纯滚轮缩放（render.js 已改为不依赖 Ctrl）；刷新由 Trilium 渲染笔记自带。
  * ============================================================ */
 (function() {
   function ready(fn) {
@@ -17,10 +18,10 @@
   function showErr(msg) {
     var c = document.getElementById('bp-container');
     if (!c) return;
+    c.innerHTML = '';
     var el = document.createElement('div');
     el.className = 'bp-error';
     el.textContent = '渲染失败：' + String(msg);
-    c.innerHTML = '';
     c.appendChild(el);
   }
 
@@ -82,7 +83,7 @@
         })(book.noteId, 4);
       }
 
-      return { text: text, css: assets.css || '', js: assets.js || '', title: rn.title || 'Blueprint' };
+      return { text: text, css: assets.css || '', js: assets.js || '' };
     }, [renderNoteId, currentId]);
   }
 
@@ -104,38 +105,17 @@
 
   function doRender(sourceText) {
     var container = document.getElementById('bp-container');
+    if (!container) return;
     try {
-      if (container && container.__bpInst) { try { container.__bpInst.stop(); } catch (e) {} container.__bpInst = null; }
-      if (container) container.innerHTML = '';
+      if (container.__bpInst) { try { container.__bpInst.stop(); } catch (e) {} container.__bpInst = null; }
+      container.innerHTML = '';
       if (!sourceText) { showErr('蓝图源码为空'); return; }
       if (!(window.blueprintUE && window.blueprintUE.render && window.blueprintUE.render.Main)) { showErr('渲染引擎(render.js)未加载'); return; }
-      if (!container) return;
-      var h = container.clientHeight || Math.max(300, (window.innerHeight || 800) - 90);
+      // 让 frame 高度跟随容器实际高度，铺满整个渲染区
+      var h = container.clientHeight || window.innerHeight || 800;
       container.__bpInst = new window.blueprintUE.render.Main(sourceText, container, { height: h + 'px' });
       container.__bpInst.start();
     } catch (e) { showErr(e && e.message ? e.message : e); console.error(e); }
-  }
-
-  function panel(el) {
-    var g = document.getElementById('bp-canvas');
-    var c = document.getElementById('bp-code');
-    var bg = document.getElementById('bp-btn-graph');
-    var bc = document.getElementById('bp-btn-code');
-    if (el === 'graph') { if (g) g.classList.add('is-active'); if (c) c.classList.remove('is-active'); if (bg) bg.classList.add('is-active'); if (bc) bc.classList.remove('is-active'); }
-    else { if (c) c.classList.add('is-active'); if (g) g.classList.remove('is-active'); if (bc) bc.classList.add('is-active'); if (bg) bg.classList.remove('is-active'); }
-  }
-
-  function showGraph() {
-    panel('graph');
-    var cc = document.getElementById('bp-container');
-    if (cc && cc.__rendered) doRender(cc.__text);
-  }
-
-  function showCode() {
-    panel('code');
-    var cc = document.getElementById('bp-container');
-    var area = document.getElementById('bp-code-area');
-    if (area && cc) area.value = cc.__text || '';
   }
 
   function refresh() {
@@ -146,35 +126,23 @@
 
     backendLoad(renderNoteId, currentId).then(function(r) {
       if (r.error) { showErr(r.error); return; }
-      var titleEl = document.getElementById('bp-title');
-      if (titleEl) titleEl.textContent = r.title || 'Blueprint';
       injectAssets(r.css, r.js);
       var cc = document.getElementById('bp-container');
       if (cc) { cc.__text = r.text; cc.__rendered = true; }
-      var area = document.getElementById('bp-code-area');
-      if (area) area.value = r.text;
       doRender(r.text);
     }).catch(function(e) { showErr(e && e.message ? e.message : e); console.error(e); });
   }
 
   ready(function() {
-    var btnRefresh = document.getElementById('bp-btn-refresh');
-    var btnGraph = document.getElementById('bp-btn-graph');
-    var btnCode = document.getElementById('bp-btn-code');
-    if (btnRefresh) btnRefresh.addEventListener('click', refresh);
-    if (btnGraph) btnGraph.addEventListener('click', showGraph);
-    if (btnCode) btnCode.addEventListener('click', showCode);
-    var rt = null;
-    window.addEventListener('resize', function() {
-      var g = document.getElementById('bp-canvas');
-      if (g && g.classList.contains('is-active')) {
-        clearTimeout(rt);
-        rt = setTimeout(function() {
-          var cc = document.getElementById('bp-container');
-          if (cc && cc.__rendered) doRender(cc.__text);
-        }, 200);
-      }
-    });
     refresh();
+    var rt = null;
+    // 视口变化时重新铺满
+    window.addEventListener('resize', function() {
+      clearTimeout(rt);
+      rt = setTimeout(function() {
+        var cc = document.getElementById('bp-container');
+        if (cc && cc.__rendered) doRender(cc.__text);
+      }, 200);
+    });
   });
 })();
