@@ -7,15 +7,19 @@
     color: var(--main-text-color, #e0e0e0);
     background: transparent;
   }
-  #bp-container { background: #0d0d0d; overflow: hidden; }
-  /* 强制图区深色：缩小视图(scale<1)时画布变小，露出的是 .frame/.bue-render 背景，
-     覆盖 blueprintUE 默认的 .frame{#a6a6a6} 灰色，避免嵌入/缩小时背景发白 */
-  #bp-app .bue-render,
-  #bp-app .frame,
+  #bp-container { background: #1e1e1e; overflow: hidden; }
+  /* 图区底色：用中等深灰(而非接近纯黑 #0d0d0d)，让空白画布不那么突兀；
+     同时把蓝图引擎自带的网格贴到 .frame 上，空区也有网格纹理，避免一块实心黑。 */
+  #bp-app .bue-render { height: 100%; overflow: hidden; background: transparent; }
   #bp-app .layer,
-  #bp-app .canvas { background: #0d0d0d; }
-  #bp-app .bue-render { height: 100%; overflow: hidden; }
-  #bp-app .frame { overflow: hidden; }
+  #bp-app .canvas { background: transparent; }
+  #bp-app .frame {
+    background-color: #1e1e1e;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAG1BMVEUVFRUWFhYkJCQlJSUzMzMmJiY0NDQxMTEyMjIQl+acAAAAXklEQVR4AWKAA0HyAAOTkrIxCDiHQkAqifSgMWDUgFEDRg1g7wCCFhcgcEsjB4wGIqCdOhYAAAAAGORvPYw9CXQ2AQCADwAAgA8AAIAPAACADwAAgA8AAIAPfgAAAASSCCi35k/7bwAAAABJRU5ErkJggg==");
+    background-repeat: repeat;
+    background-size: 88px 88px;
+    overflow: hidden;
+  }
   #bp-app .bp-error {
     color: #ff4d4d;
     padding: 24px;
