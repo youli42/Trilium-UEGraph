@@ -113,6 +113,10 @@
     try {
       var scope = (api.$container && api.$container[0]) ? api.$container[0] : document.querySelector('.render-note-scope');
       if (scope && scope.closest) {
+        // 嵌入(include-note)时，量宿主里那段 include 容器的高度（box-size 已定高）；
+        // 独立打开时量自己的 .scrolling-container。
+        var embed = scope.closest('section.include-note');
+        if (embed && embed.clientHeight) return embed.clientHeight;
         var scroller = scope.closest('.scrolling-container');
         if (scroller && scroller.clientHeight) return scroller.clientHeight;
       }
@@ -152,6 +156,9 @@
   }
 
   ready(function() {
+    // 屏蔽宿主/浏览器右键菜单，避免打断蓝图引擎的右键拖拽平移
+    var ccGu = document.getElementById('bp-container');
+    if (ccGu) ccGu.addEventListener('contextmenu', function(e) { if (e) e.preventDefault(); });
     refresh();
     var rt = null;
     // 视口变化时重新铺满
