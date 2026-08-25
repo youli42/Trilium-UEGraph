@@ -1,0 +1,92 @@
+<style>
+  /* ===== Blueprint Render App Shell ===== */
+  #bp-app {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 70vh;
+    height: 100%;
+    color: var(--main-text-color, #e0e0e0);
+    background: transparent;
+  }
+  #bp-app .bp-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(128,128,128,0.18);
+    background: rgba(128,128,128,0.04);
+  }
+  #bp-app .bp-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #50e3c2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+  }
+  #bp-app .bp-spacer { flex: 1; }
+  #bp-app .bp-btn {
+    border: 1px solid rgba(128,128,128,0.25);
+    color: inherit;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  #bp-app .bp-btn:hover { background: rgba(128,128,128,0.1); }
+  #bp-app .bp-btn.is-active { background: rgba(128,128,128,0.14); border-color: #50e3c2; color: #50e3c2; }
+  #bp-app .bp-btn.bp-btn-refresh { background: #50e3c2; color: #0d0d0d; border: none; font-weight: 600; }
+  #bp-app .bp-btn.bp-btn-refresh:hover { background: #3dc4a6; }
+
+  #bp-app .bp-panel { flex: 1 1 auto; min-height: 0; display: none; overflow: auto; }
+  #bp-app .bp-panel.is-active { display: block; }
+  #bp-app .bp-container { min-height: 100%; height: 70vh; background: #0d0d0d; overflow: hidden; }
+  #bp-app .bp-textarea {
+    width: 100%;
+    height: 70vh;
+    min-height: 100%;
+    display: block;
+    box-sizing: border-box;
+    background: #111;
+    color: #cdd6f4;
+    border: none;
+    padding: 14px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    tab-size: 4;
+    outline: none;
+  }
+  #bp-app .bp-error {
+    color: #ff4d4d;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: Consolas, monospace;
+    white-space: pre-wrap;
+  }
+</style>
+
+<div id="bp-app">
+  <header class="bp-toolbar">
+    <span class="bp-title" id="bp-title">Blueprint</span>
+    <span class="bp-spacer"></span>
+    <button type="button" class="bp-btn is-active" id="bp-btn-graph">蓝图</button>
+    <button type="button" class="bp-btn" id="bp-btn-code">源码</button>
+    <button type="button" class="bp-btn bp-btn-refresh" id="bp-btn-refresh">刷新</button>
+  </header>
+  <main class="bp-panel is-active" id="bp-canvas">
+    <div class="bp-container" id="bp-container"></div>
+  </main>
+  <main class="bp-panel" id="bp-code">
+    <textarea class="bp-textarea" id="bp-code-area" readonly spellcheck="false" placeholder="蓝图源码（只读，请编辑同级 代码笔记 修改）"></textarea>
+  </main>
+</div>
