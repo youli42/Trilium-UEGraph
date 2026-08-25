@@ -1,4 +1,3 @@
-
 'use strict';
 /* ============================================================
  * 蓝图记录 · 渲染脚本（共享）
@@ -11,13 +10,59 @@
  * 交互：纯滚轮缩放（render.js 已改为不依赖 Ctrl）；刷新由 Trilium 渲染笔记自带。
  * ============================================================ */
 (function() {
-  function ready(fn) {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
-    else fn();
+  var MAX_WAIT_CONTAINER = 5000;
+  var MAX_WAIT_ENGINE = 3000;
+
+  function getScope() {
+    if (api.$container && api.$container[0]) return api.$container[0];
+    var scope = document.querySelector('.render-note-scope');
+    if (scope) return scope;
+    return document.body;
+  }
+
+  function getContainer() {
+    var scope = getScope();
+    var container = scope.querySelector('#bp-container');
+    return container || document.getElementById('bp-container');
+  }
+
+  function whenContainerReady(callback, maxWait) {
+    var startTime = Date.now();
+    maxWait = maxWait || MAX_WAIT_CONTAINER;
+
+    function check() {
+      var container = getContainer();
+      if (container) {
+        callback();
+        return;
+      }
+      if (Date.now() - startTime < maxWait) {
+        requestAnimationFrame(check);
+      } else {
+        console.warn('[蓝图渲染] bp-container 未在', maxWait, 'ms 内就绪');
+      }
+    }
+    requestAnimationFrame(check);
+  }
+
+  function ensureBlueprintUE(callback, maxWait) {
+    maxWait = maxWait || MAX_WAIT_ENGINE;
+    var startTime = Date.now();
+
+    function check() {
+      if (window.blueprintUE && window.blueprintUE.render && window.blueprintUE.render.Main) {
+        callback();
+      } else if (Date.now() - startTime < maxWait) {
+        setTimeout(check, 50);
+      } else {
+        showErr('渲染引擎初始化超时');
+      }
+    }
+    check();
   }
 
   function showErr(msg) {
-    var c = document.getElementById('bp-container');
+    var c = getContainer();
     if (!c) return;
     c.innerHTML = '';
     var el = document.createElement('div');
@@ -30,7 +75,6 @@
     return api.runOnBackend(function(rnId, curId) {
       function dec(c) { return Buffer.isBuffer(c) ? c.toString('utf8') : String(c || ''); }
 
-      // 判断 noteId 是否为 rootId 的子孙（用于校验 #blueprintText 是否真的指向本笔记的子笔记）
       function isDescendantOf(noteId, rootId) {
         if (!noteId || !rootId) return false;
         var cur = null, depth = 0;
@@ -44,14 +88,10 @@
         return false;
       }
 
-      // 1) 定位渲染笔记（当前蓝图记录）
       var rn = rnId ? api.getNote(rnId) : null;
       if (!rn && curId) { try { rn = api.getNote(curId).getParentNotes()[0].getParentNotes()[0]; } catch (e) {} }
       if (!rn) return { error: '无法定位渲染笔记（蓝图的承载笔记）' };
 
-      // 2) 读取蓝图源码：约定优先用渲染笔记“自己的 code 子笔记”（第一个非空 code 子笔记）。
-      //    #blueprintText 仅当其指向“本笔记子树内”的笔记时才生效——避免“从模板新建”时把
-      //    旧模板的 noteId 一起复制过来，导致读到别处/旧示例文本。
       var text = '';
       var kids = rn.getChildNotes() || [];
       for (var i = 0; i < kids.length; i++) {
@@ -69,7 +109,6 @@
       }
       if (!text) return { error: '蓝图源码为空（请在渲染笔记下的 code 子笔记中粘贴 UE 复制节点的文本）' };
 
-      // 3) 资产：优先 fs 从 #renderAssetsDir 读取，否则回退到 蓝图渲染资产 子笔记
       var assets = { css: '', js: '' };
       var book = null;
       if (curId) { try { book = api.getNote(curId).getParentNotes()[0].getParentNotes()[0]; } catch (e) {} }
@@ -110,7 +149,7 @@
     }, [renderNoteId, currentId]);
   }
 
-  function injectAssets(css, js) {
+  function injectAssets(css, js, onReady) {
     try {
       if (css && !document.getElementById('bue-render-css')) {
         var st = document.createElement('style');
@@ -119,24 +158,21 @@
         document.head.appendChild(st);
       }
       if (js) {
-        // 强制重载最新引擎，避免陈旧副本（如之前加载的 ctrl-required 版本）残留
         try { if (window.blueprintUE) delete window.blueprintUE; } catch (e) {}
         var sc = document.createElement('script');
         sc.textContent = js;
         document.head.appendChild(sc);
+        if (onReady) ensureBlueprintUE(onReady);
+      } else if (onReady) {
+        onReady();
       }
     } catch (e) { console.error('injectAssets failed', e); }
   }
 
-  // 获取 note 内容面板（.scrolling-container）的可视高度。
-  // render 笔记不是 iframe、默认非 full-height：不能用 window.innerHeight（=整个应用窗口）
-  // 或容器自身 clientHeight（=内容高度，会循环），必须量 .scrolling-container 这个滚动面板。
   function getPaneHeight() {
     try {
       var scope = (api.$container && api.$container[0]) ? api.$container[0] : document.querySelector('.render-note-scope');
       if (scope && scope.closest) {
-        // 嵌入(include-note)时，量宿主里那段 include 容器的高度（box-size 已定高）；
-        // 独立打开时量自己的 .scrolling-container。
         var embed = scope.closest('section.include-note');
         if (embed && embed.clientHeight) return embed.clientHeight;
         var scroller = scope.closest('.scrolling-container');
@@ -147,14 +183,13 @@
   }
 
   function doRender(sourceText) {
-    var container = document.getElementById('bp-container');
+    var container = getContainer();
     if (!container) return;
     try {
       if (container.__bpInst) { try { container.__bpInst.stop(); } catch (e) {} container.__bpInst = null; }
       container.innerHTML = '';
       if (!sourceText) { showErr('蓝图源码为空'); return; }
       if (!(window.blueprintUE && window.blueprintUE.render && window.blueprintUE.render.Main)) { showErr('渲染引擎(render.js)未加载'); return; }
-      // 关键：高度=面板可视高度，既不会塌成 0（渲染消失），也不会比面板大（滚动条）。
       var h = Math.max(200, getPaneHeight());
       container.style.height = h + 'px';
       container.__bpInst = new window.blueprintUE.render.Main(sourceText, container, { height: h + 'px' });
@@ -170,24 +205,23 @@
 
     backendLoad(renderNoteId, currentId).then(function(r) {
       if (r.error) { showErr(r.error); return; }
-      injectAssets(r.css, r.js);
-      var cc = document.getElementById('bp-container');
+      var cc = getContainer();
       if (cc) { cc.__text = r.text; cc.__rendered = true; }
-      doRender(r.text);
+      injectAssets(r.css, r.js, function() {
+        doRender(r.text);
+      });
     }).catch(function(e) { showErr(e && e.message ? e.message : e); console.error(e); });
   }
 
-  ready(function() {
-    // 屏蔽宿主/浏览器右键菜单，避免打断蓝图引擎的右键拖拽平移
-    var ccGu = document.getElementById('bp-container');
+  whenContainerReady(function() {
+    var ccGu = getContainer();
     if (ccGu) ccGu.addEventListener('contextmenu', function(e) { if (e) e.preventDefault(); });
     refresh();
     var rt = null;
-    // 视口变化时重新铺满
     window.addEventListener('resize', function() {
       clearTimeout(rt);
       rt = setTimeout(function() {
-        var cc = document.getElementById('bp-container');
+        var cc = getContainer();
         if (cc && cc.__rendered) doRender(cc.__text);
       }, 200);
     });
