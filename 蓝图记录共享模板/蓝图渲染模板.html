@@ -1,15 +1,15 @@
 <style>
-  html, body { height: 100%; margin: 0; padding: 0; }
+  html, body { margin: 0; padding: 0; overflow: hidden; }
   *, *::before, *::after { box-sizing: border-box; }
   /* ===== Blueprint Render App Shell ===== */
   #bp-app {
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    height: 100%;
     color: var(--main-text-color, #e0e0e0);
     background: transparent;
   }
-  #bp-app #bp-canvas { height: 100%; }
-  #bp-app #bp-container { height: 100%; background: #0d0d0d; overflow: hidden; }
+  #bp-container { background: #0d0d0d; overflow: hidden; }
+  #bp-app .bue-render { height: 100%; overflow: hidden; }
+  #bp-app .frame { overflow: hidden; }
   #bp-app .bp-error {
     color: #ff4d4d;
     padding: 24px;

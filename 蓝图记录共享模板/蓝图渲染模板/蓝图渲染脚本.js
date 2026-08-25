@@ -1,3 +1,4 @@
+
 'use strict';
 /* ============================================================
  * 蓝图记录 · 渲染脚本（共享）
@@ -105,6 +106,20 @@
     } catch (e) { console.error('injectAssets failed', e); }
   }
 
+  // 获取 note 内容面板（.scrolling-container）的可视高度。
+  // render 笔记不是 iframe、默认非 full-height：不能用 window.innerHeight（=整个应用窗口）
+  // 或容器自身 clientHeight（=内容高度，会循环），必须量 .scrolling-container 这个滚动面板。
+  function getPaneHeight() {
+    try {
+      var scope = (api.$container && api.$container[0]) ? api.$container[0] : document.querySelector('.render-note-scope');
+      if (scope && scope.closest) {
+        var scroller = scope.closest('.scrolling-container');
+        if (scroller && scroller.clientHeight) return scroller.clientHeight;
+      }
+    } catch (e) {}
+    return window.innerHeight || 600;
+  }
+
   function doRender(sourceText) {
     var container = document.getElementById('bp-container');
     if (!container) return;
@@ -113,8 +128,8 @@
       container.innerHTML = '';
       if (!sourceText) { showErr('蓝图源码为空'); return; }
       if (!(window.blueprintUE && window.blueprintUE.render && window.blueprintUE.render.Main)) { showErr('渲染引擎(render.js)未加载'); return; }
-      // 让 frame 高度跟随容器实际高度，铺满整个渲染区
-      var h = container.clientHeight || window.innerHeight || 800;
+      // 关键：高度=面板可视高度，既不会塌成 0（渲染消失），也不会比面板大（滚动条）。
+      var h = Math.max(200, getPaneHeight());
       container.style.height = h + 'px';
       container.__bpInst = new window.blueprintUE.render.Main(sourceText, container, { height: h + 'px' });
       container.__bpInst.start();
