@@ -30,22 +30,44 @@
     return api.runOnBackend(function(rnId, curId) {
       function dec(c) { return Buffer.isBuffer(c) ? c.toString('utf8') : String(c || ''); }
 
+      // 判断 noteId 是否为 rootId 的子孙（用于校验 #blueprintText 是否真的指向本笔记的子笔记）
+      function isDescendantOf(noteId, rootId) {
+        if (!noteId || !rootId) return false;
+        var cur = null, depth = 0;
+        try { cur = api.getNote(noteId); } catch (e) { return false; }
+        while (cur && depth < 30) {
+          if (cur.noteId === rootId) return true;
+          var ps = cur.getParentNotes();
+          if (!ps || !ps.length) return false;
+          cur = ps[0]; depth++;
+        }
+        return false;
+      }
+
       // 1) 定位渲染笔记（当前蓝图记录）
       var rn = rnId ? api.getNote(rnId) : null;
       if (!rn && curId) { try { rn = api.getNote(curId).getParentNotes()[0].getParentNotes()[0]; } catch (e) {} }
       if (!rn) return { error: '无法定位渲染笔记（蓝图的承载笔记）' };
 
-      // 2) 读取蓝图源码：优先 #blueprintText label，否则取第一个 code 子笔记
+      // 2) 读取蓝图源码：约定优先用渲染笔记“自己的 code 子笔记”（第一个非空 code 子笔记）。
+      //    #blueprintText 仅当其指向“本笔记子树内”的笔记时才生效——避免“从模板新建”时把
+      //    旧模板的 noteId 一起复制过来，导致读到别处/旧示例文本。
       var text = '';
-      var lbl = rn.getLabelValue('blueprintText');
-      if (lbl) { var ln = api.getNote(lbl); if (ln) { text = dec(ln.getContent()); } }
-      if (!text) {
-        var kids = rn.getChildNotes() || [];
-        for (var i = 0; i < kids.length; i++) {
-          if (kids[i].type === 'code') { text = dec(kids[i].getContent()); break; }
+      var kids = rn.getChildNotes() || [];
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].type === 'code') {
+          var c = dec(kids[i].getContent());
+          if (c) { text = c; break; }
         }
       }
-      if (!text) return { error: '未找到蓝图源码子笔记（请在渲染笔记下加 code 子笔记，或挂 #blueprintText = noteId）' };
+      if (!text) {
+        var lbl = rn.getLabelValue('blueprintText');
+        if (lbl && isDescendantOf(lbl, rn.noteId)) {
+          var ln = api.getNote(lbl);
+          if (ln) text = dec(ln.getContent());
+        }
+      }
+      if (!text) return { error: '蓝图源码为空（请在渲染笔记下的 code 子笔记中粘贴 UE 复制节点的文本）' };
 
       // 3) 资产：优先 fs 从 #renderAssetsDir 读取，否则回退到 蓝图渲染资产 子笔记
       var assets = { css: '', js: '' };
