@@ -927,7 +927,7 @@
 	}, s.prototype.eventPointerLongpress = function(a) {
 		this.states.isLongpress = !0, this.states.isRightClick = !0
 	}, s.prototype.eventPointerWheel = function(a) {
-		if (!1 === this.states.inFullscreen && !1 === a.ctrlKey) this.showOverlayForZoom("Use ctrl + scroll to zoom");
+		if (!0 === a.ctrlKey || !0 === a.metaKey) return !0;
 		else {
 			if (this.eventsBinding.hideOverlayForZoom(), a.preventDefault(), this.states.isRightClick || this.states.isLeftClick) return !1;
 			if (a.deltaY < 100) {

@@ -95,7 +95,9 @@
         st.textContent = css;
         document.head.appendChild(st);
       }
-      if (js && !window.blueprintUE) {
+      if (js) {
+        // 强制重载最新引擎，避免陈旧副本（如之前加载的 ctrl-required 版本）残留
+        try { if (window.blueprintUE) delete window.blueprintUE; } catch (e) {}
         var sc = document.createElement('script');
         sc.textContent = js;
         document.head.appendChild(sc);
@@ -113,6 +115,7 @@
       if (!(window.blueprintUE && window.blueprintUE.render && window.blueprintUE.render.Main)) { showErr('渲染引擎(render.js)未加载'); return; }
       // 让 frame 高度跟随容器实际高度，铺满整个渲染区
       var h = container.clientHeight || window.innerHeight || 800;
+      container.style.height = h + 'px';
       container.__bpInst = new window.blueprintUE.render.Main(sourceText, container, { height: h + 'px' });
       container.__bpInst.start();
     } catch (e) { showErr(e && e.message ? e.message : e); console.error(e); }
