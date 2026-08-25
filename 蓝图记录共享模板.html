@@ -1,0 +1,82 @@
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <base target="_parent">
+    <title data-trilium-title>蓝图记录共享模板</title>
+  </head>
+  
+  <body>
+    <div class="content">
+       <h1 data-trilium-h1>蓝图记录共享模板</h1>
+
+      <div class="ck-content">
+        <h2>蓝图记录共享模板</h2>
+        <p>一个用于<strong>记录并展示 UE 蓝图节点图</strong>的 Trilium 共享模板。把 UE 编辑器里"复制节点"得到的文本当作一份<strong>代码笔记</strong>保存，本模板会在渲染笔记里自动绘出对应的节点图。</p>
+        <h3>目录结构</h3><pre><code class="language-text-x-trilium-auto">蓝图记录共享模板（书，本笔记）
+ ├─ 蓝图渲染模板（code/text/html）         ← 渲染界面骨架（工具栏 + 画布 + 源码面板）
+ │    └─ 蓝图渲染脚本（code/js）           ← 胶水逻辑：定位记录、读源码、注入引擎、绘制
+ ├─ 蓝图渲染资产（书）
+ │    ├─ render.js（可留空占位）            ← blueprintUE 渲染引擎
+ │    └─ render.css（可留空占位）           ← 样式
+ ├─ 使用说明（本笔记）
+ └─ 演示·蓝图记录（render 笔记）
+      └─ 示例蓝图文本（code/text/plain）    ← 演示用的源码</code></pre>
+        <blockquote>
+          <p>任何一张「蓝图记录」的形态都是：<strong>一个 render 笔记 + 一个子 code 笔记（存 T3D 源码）</strong>，并把
+            render 笔记的 <code spellcheck="false">~renderNote</code> 关系指向 <code spellcheck="false">蓝图渲染模板</code>。</p>
+        </blockquote>
+        <h3>关键要点</h3>
+        <ul>
+          <li><code spellcheck="false"><strong>~renderNote</strong></code>：render 笔记指向
+            <code
+            spellcheck="false">蓝图渲染模板</code>的关系。可跨目录引用（放在任何位置都行）。</li>
+          <li><code spellcheck="false"><strong>#blueprintText</strong></code><strong>（可选）</strong>：指到【存源码的子
+            code 笔记】。若不设，则自动取 render 笔记下<strong>第一个 code 子笔记</strong>作为源码。</li>
+          <li><strong>资产加载</strong>：渲染脚本会先用 <code spellcheck="false">fs</code> 读取
+            <code
+            spellcheck="false">#renderAssetsDir</code>指向的本地目录里的 <code spellcheck="false">render.js</code>/
+              <code
+              spellcheck="false">render.css</code>；读不到时回退到 <code spellcheck="false">蓝图渲染资产</code> 下的同名笔记。
+                <code
+                spellcheck="false">#renderAssetsDir</code>目前指向 <code spellcheck="false">F:\code\blueprintue-self-hosted-edition\www\bue-render</code>。</li>
+        </ul>
+        <h3>如何新建一张蓝图记录</h3>
+        <ol>
+          <li>在目标目录新建一个 <strong>render 笔记</strong>（类型 render），命名如「某个蓝图」。</li>
+          <li>在该 render 笔记下新建一个 <strong>code 子笔记</strong>（mime 用 <code spellcheck="false">text/plain</code>），命名为「蓝图文本」或任意名。</li>
+          <li>把 UE 编辑器里选中节点 → 右键「复制(Copy)」得到的整段文本粘贴进该 code 子笔记。</li>
+          <li>给 render 笔记加属性：
+            <ul>
+              <li>关系 <code spellcheck="false">~renderNote</code> → <code spellcheck="false">蓝图渲染模板</code>（本库里的
+                <code
+                spellcheck="false">E1T63jd042tq</code>）。</li>
+              <li>（推荐）标签 <code spellcheck="false">blueprintText</code> = 源码 code 子笔记的 noteId；不设则自动取第一个
+                code 子笔记。</li>
+            </ul>
+          </li>
+          <li>保存，打开 render 笔记即可看到节点图；可切「源码」查看、点「刷新」重画。</li>
+        </ol>
+        <h3>输入格式要求</h3>
+        <p>必须是 UE 编辑器「复制节点」生成的 <strong>T3D 文本</strong>，形如：</p><pre><code class="language-text-x-trilium-auto">Begin Object Class=/Script/BlueprintGraph.K2Node_Event ...</code></pre>
+        <p>粘贴纯蓝图 JSON、<code spellcheck="false">.uasset</code>、粘图片均<strong>不生效</strong>。若格式不符，画布会显示红色错误提示。</p>
+        <h3>维护</h3>
+        <ul>
+          <li><strong>升级渲染引擎</strong>：替换 <code spellcheck="false">F:\code\blueprintue-self-hosted-edition\www\bue-render</code> 下
+            <code
+            spellcheck="false">render.js</code>/ <code spellcheck="false">render.css</code>（或直接更新
+              <code
+              spellcheck="false">蓝图渲染资产</code>里的同名笔记，去掉占位内容）。</li>
+          <li><strong>脱离本地目录</strong>：把 <code spellcheck="false">render.js</code>、
+            <code
+            spellcheck="false">render.css</code>的完整内容粘贴进 <code spellcheck="false">蓝图渲染资产</code> 下两个同名笔记（替换占位文本），再把
+              <code
+              spellcheck="false">#renderAssetsDir</code>清空。即可完全自包含、不依赖外部路径。</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+
+</html>
