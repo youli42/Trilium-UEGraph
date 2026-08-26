@@ -31,13 +31,6 @@
 				},
 				{
 					"type": "label",
-					"name": "renderAssetsDir",
-					"value": "F:\\code\\blueprintue-self-hosted-edition\\www\\bue-render",
-					"isInheritable": false,
-					"position": 50
-				},
-				{
-					"type": "label",
 					"name": "language",
 					"value": "cn",
 					"isInheritable": false,
@@ -151,7 +144,7 @@
 						"EkLhqsPxvqqK",
 						"pTJuCqZqwXJQ"
 					],
-					"title": "蓝图渲染模板",
+					"title": "unreal - 蓝图渲染模板",
 					"notePosition": 40,
 					"prefix": null,
 					"isExpanded": true,
@@ -171,10 +164,17 @@
 							"value": "",
 							"isInheritable": false,
 							"position": 20
+						},
+						{
+							"type": "label",
+							"name": "iconClass",
+							"value": "bx bx-git-merge",
+							"isInheritable": false,
+							"position": 30
 						}
 					],
 					"attachments": [],
-					"dirFileName": "1_蓝图渲染模板",
+					"dirFileName": "unreal - 蓝图渲染模板",
 					"children": [
 						{
 							"isClone": false,

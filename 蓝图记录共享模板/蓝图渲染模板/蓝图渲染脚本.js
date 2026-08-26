@@ -5,13 +5,12 @@
  *       渲染引擎(render.js/render.css)在模板里绘出节点图。
  * 关键 API：api.originEntity = 承载 ~renderNote 的那个渲染笔记(当前蓝图记录)
  *          api.currentNote    = 本脚本所在笔记（__FILE__），用于上溯定位资产库
- * 资产来源：优先从 库书上的 #renderAssetsDir 指向的本地目录读取（fs），
- *          否则回退读取 蓝图渲染资产 子笔记内容。
+ * 资产来源：从 库书下的「蓝图渲染资产」子笔记读取 render.js / render.css。
  * 交互：纯滚轮缩放（render.js 已改为不依赖 Ctrl）；刷新由 Trilium 渲染笔记自带。
  * ============================================================ */
 (function() {
-  var MAX_WAIT_CONTAINER = 5000;
-  var MAX_WAIT_ENGINE = 3000;
+  var MAX_WAIT_CONTAINER = 5000; // 最长等待容器出现的时间（毫秒）
+  var MAX_WAIT_ENGINE = 3000; // 最长等待渲染引擎初始化的时间（毫秒）
 
   function getScope() {
     if (api.$container && api.$container[0]) return api.$container[0];
@@ -113,20 +112,7 @@
       var book = null;
       if (curId) { try { book = api.getNote(curId).getParentNotes()[0].getParentNotes()[0]; } catch (e) {} }
 
-      var dir = (book && book.getLabelValue) ? book.getLabelValue('renderAssetsDir') : '';
-      if (dir) {
-        try {
-          var fs = require('fs'), path = require('path');
-          ['render.css', 'render.js'].forEach(function(f) {
-            try {
-              var p = path.join(dir, f);
-              if (fs.existsSync(p)) assets[f] = fs.readFileSync(p, 'utf8');
-            } catch (e) {}
-          });
-        } catch (e) {}
-      }
-
-      if ((!assets.css || !assets.js) && book) {
+      if (book) {
         (function walk(id, depth) {
           if (depth < 0) return;
           var n = api.getNote(id);
