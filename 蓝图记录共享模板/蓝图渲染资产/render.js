@@ -2714,7 +2714,7 @@
 					name: "data-id",
 					value: this.guid
 				}],
-				childs: [this.generateHTMLToolTip()]
+				childs: [this.generateHTMLCommentBubble()]
 			},
 			c = 0,
 			d = this.generateHTMLBody();
@@ -2728,6 +2728,21 @@
 	}, Y.prototype.generateHTMLPinsOutput = function() {
 		for (var a = [], b = this.isAdvancedPinDisplayExpanded(), c = 0, d = this.pins.length; c < d; ++c) this.pins[c].isOutput() && (this.pins[c].disableTextAndInput(), a.push(this.pins[c].generateHTML(b, this)));
 		return a
+	}, Y.prototype.generateHTMLCommentBubble = function() {
+		var text = this.comment;
+		if (!text || 0 === text.length) {
+			for (var i = 0, n = this.nodes.length; i < n; i++) {
+				var d = h(this.nodes[i].props, "Desc");
+				if (d && d.value) { text = d.value; break; }
+			}
+		}
+		if (!text || 0 === text.length) return null;
+		var c = co(bv(bu(text).replaceAll("\\'", "'").replace(/\\"/g, '"')));
+		return {
+			tag: "div",
+			classes: ["comment-bubble"],
+			text: c
+		}
 	};
 
 	function Z() {

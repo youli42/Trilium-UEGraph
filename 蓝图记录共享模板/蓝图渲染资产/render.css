@@ -851,6 +851,21 @@
 	top: 4px
 }
 
+.bue-render .node.knot .comment-bubble {
+	position: absolute;
+	top: 14px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #2b2b2b;
+	color: #d8d8d8;
+	border: 1px solid #444;
+	border-radius: 8px;
+	padding: 2px 8px;
+	font-size: 11px;
+	white-space: nowrap;
+	z-index: 6
+}
+
 .bue-render .node .tooltip {
 	background-color: #cfcfcf;
 	border-radius: 5px;
