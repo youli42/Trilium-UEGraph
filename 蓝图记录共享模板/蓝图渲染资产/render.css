@@ -366,6 +366,78 @@
 	background: linear-gradient(90deg, rgba(144, 118, 35, .4) 0, rgba(144, 118, 35, .1))
 }
 
+.bue-render .node-color.material-scalar {
+	background-color: #4f7a3a
+}
+
+.bue-render .node-color.material-scalar.gradient {
+	background: linear-gradient(90deg, rgba(79, 122, 58, .4) 0, rgba(79, 122, 58, .1))
+}
+
+.bue-render .node-color.material-vector {
+	background-color: #907623
+}
+
+.bue-render .node-color.material-vector.gradient {
+	background: linear-gradient(90deg, rgba(144, 118, 35, .4) 0, rgba(144, 118, 35, .1))
+}
+
+.bue-render .node-color.material-texture {
+	background-color: #1f6f9a
+}
+
+.bue-render .node-color.material-texture.gradient {
+	background: linear-gradient(90deg, rgba(31, 111, 154, .4) 0, rgba(31, 111, 154, .1))
+}
+
+.bue-render .node-color.material-coordinate {
+	background-color: #a02828
+}
+
+.bue-render .node-color.material-coordinate.gradient {
+	background: linear-gradient(90deg, rgba(160, 40, 40, .4) 0, rgba(160, 40, 40, .1))
+}
+
+.bue-render .node-color.material-switch {
+	background-color: #2f8a7a
+}
+
+.bue-render .node-color.material-switch.gradient {
+	background: linear-gradient(90deg, rgba(47, 138, 122, .4) 0, rgba(47, 138, 122, .1))
+}
+
+.bue-render .node-color.material-math {
+	background-color: #4f7a3a
+}
+
+.bue-render .node-color.material-math.gradient {
+	background: linear-gradient(90deg, rgba(79, 122, 58, .4) 0, rgba(79, 122, 58, .1))
+}
+
+.bue-render .node-color.material-space {
+	background-color: #a02828
+}
+
+.bue-render .node-color.material-space.gradient {
+	background: linear-gradient(90deg, rgba(160, 40, 40, .4) 0, rgba(160, 40, 40, .1))
+}
+
+.bue-render .node-color.material-effect {
+	background-color: #4f7a3a
+}
+
+.bue-render .node-color.material-effect.gradient {
+	background: linear-gradient(90deg, rgba(79, 122, 58, .4) 0, rgba(79, 122, 58, .1))
+}
+
+.bue-render .node-color.material-particle {
+	background-color: #a02828
+}
+
+.bue-render .node-color.material-particle.gradient {
+	background: linear-gradient(90deg, rgba(160, 40, 40, .4) 0, rgba(160, 40, 40, .1))
+}
+
 .bue-render .node-color.cast {
 	background-color: #137479
 }

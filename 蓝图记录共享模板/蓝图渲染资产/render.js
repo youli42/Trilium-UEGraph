@@ -1168,6 +1168,9 @@
 		blueprintClass: "MaterialGraphNode_Comment",
 		NodeConstructor: N
 	}, {
+		blueprintClass: "MaterialGraphNode_Knot",
+		NodeConstructor: Y
+	}, {
 		blueprintClass: "MaterialGraphNode",
 		NodeConstructor: Z
 	}, {
@@ -2746,7 +2749,20 @@
 		}
 	}, Z.prototype.findCssClassNodeColor = function() {
 		var a = h(this.nodes[0].objectDefinition, "Class");
-		return null !== a && -1 !== a.value.indexOf("MaterialExpressionMaterialFunctionCall") ? "function-call" : null !== a && -1 !== a.value.indexOf("MaterialExpressionConstantVector") ? "material-constant" : null !== a && -1 !== a.value.indexOf("MaterialExpressionConstant") || null !== a && -1 !== a.value.indexOf("MaterialExpression") ? "pure-function-call" : ""
+		if (null === a || !a.value) return "";
+		var c = a.value;
+		if (c.indexOf("MaterialExpressionMaterialFunctionCall") !== -1) return "function-call";
+		if (c.indexOf("MaterialExpressionConstant2Vector") !== -1 || c.indexOf("MaterialExpressionConstant3Vector") !== -1 || c.indexOf("MaterialExpressionConstant4Vector") !== -1 || c.indexOf("MaterialExpressionConstantVector") !== -1) return "material-constant";
+		if (c.indexOf("MaterialExpressionScalarParameter") !== -1) return "material-scalar";
+		if (c.indexOf("MaterialExpressionConstant") !== -1) return "material-scalar";
+		if (c.indexOf("MaterialExpressionLinearInterpolate") !== -1 || c.indexOf("MaterialExpressionAdd") !== -1 || c.indexOf("MaterialExpressionSubtract") !== -1 || c.indexOf("MaterialExpressionMultiply") !== -1 || c.indexOf("MaterialExpressionDivide") !== -1 || c.indexOf("MaterialExpressionPower") !== -1 || c.indexOf("MaterialExpressionAbs") !== -1 || c.indexOf("MaterialExpressionOneMinus") !== -1 || c.indexOf("MaterialExpressionClamp") !== -1 || c.indexOf("MaterialExpressionDotProduct") !== -1 || c.indexOf("MaterialExpressionCrossProduct") !== -1 || c.indexOf("MaterialExpressionComponentMask") !== -1 || c.indexOf("MaterialExpressionAppendVector") !== -1 || c.indexOf("MaterialExpressionNormalize") !== -1) return "material-math";
+		if (c.indexOf("MaterialExpressionTextureCoordinate") !== -1) return "material-coordinate";
+		if (c.indexOf("MaterialExpressionTexture") !== -1) return "material-texture";
+		if (c.indexOf("MaterialExpressionStaticSwitchParameter") !== -1) return "material-switch";
+		if (c.indexOf("MaterialExpressionWorldPosition") !== -1 || c.indexOf("MaterialExpressionCameraPositionWS") !== -1 || c.indexOf("MaterialExpressionVertexNormalWS") !== -1 || c.indexOf("MaterialExpressionObjectPositionWS") !== -1 || c.indexOf("MaterialExpressionActorPositionWS") !== -1 || c.indexOf("MaterialExpressionTime") !== -1) return "material-space";
+		if (c.indexOf("MaterialExpressionParticleColor") !== -1) return "material-particle";
+		if (c.indexOf("MaterialExpressionFresnel") !== -1 || c.indexOf("MaterialExpressionPanner") !== -1 || c.indexOf("MaterialExpressionRotator") !== -1 || c.indexOf("MaterialExpressionDesaturation") !== -1 || c.indexOf("MaterialExpressionNoise") !== -1) return "material-effect";
+		return "material-math"
 	}, Z.prototype.getMaterialName = function() {
 		var a, b, c = "",
 			d = -1,
