@@ -1851,31 +1851,6 @@
 			if (-1 !== d.value.indexOf("K2Node_CallFunction")) return null !== (a = h(this.props, "bIsPureFunc")) && "True" === a.value ? "pure-function-call" : "function-call"
 		}
 		return null !== h(this.props, "DelegateReference") ? "function-call" : null !== h(this.props, "MacroGraphReference") ? "macro" : null !== (a = h(this.props, "FunctionReference")) && "Concat_StrStr" === h(a.value, "MemberName").value ? "pure-function-call" : "function-call"
-	}, o.prototype.generateHTMLToolTip = function() {
-		var a, b, c = "",
-			d = {
-				tag: "div",
-				classes: ["tooltip"]
-			},
-			e = [],
-			f = 0;
-		if (0 === this.comment.length) return null;
-		if (((c = co(bv(bu(this.comment).replaceAll("\\'", "'").replace(/\\"/g, '"')))).match(/<br>/g) || []).length < 1) d.text = c, d.attrs = [{
-			name: "style",
-			value: "top:-33px"
-		}];
-		else {
-			for (b = (a = c.split(/<br>/g)).length; f < b; ++f) e.push({
-				text: a[f]
-			}), f + 1 < b && e.push({
-				tag: "br"
-			});
-			d.childs = e, d.attrs = [{
-				name: "style",
-				value: "top:-" + (e.length / 2 * 15 + 28) + "px"
-			}]
-		}
-		return d
 	}, o.prototype.generateHTMLCommentBubble = function() {
 		var text = this.comment;
 		if (!text || 0 === text.length) return null;
