@@ -1809,7 +1809,7 @@
 					name: "data-id",
 					value: this.guid
 				}],
-				childs: [this.generateHTMLToolTip(), this.generateHTMLHeader()]
+				childs: [this.generateHTMLCommentBubble(), this.generateHTMLHeader()]
 			},
 			c = this.generateHTMLBody(),
 			d = 0;
@@ -1876,6 +1876,14 @@
 			}]
 		}
 		return d
+	}, o.prototype.generateHTMLCommentBubble = function() {
+		var text = this.comment;
+		if (!text || 0 === text.length) return null;
+		return {
+			tag: "div",
+			classes: ["comment-bubble"],
+			text: co(bv(bu(text).replaceAll("\\'", "'").replace(/\\"/g, '"')))
+		}
 	}, o.prototype.findCssClassNodeIcon = function() {
 		var a = h(this.props, "MacroGraphReference"),
 			b = null,
@@ -2157,7 +2165,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, bc.prototype.generateHTMLBody = function() {
 		var a = [],
@@ -2351,7 +2359,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, O.prototype.generateHTMLBody = function() {
 		return {
@@ -2447,7 +2455,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, bn.prototype.generateHTMLBody = function() {
 		return {
@@ -2665,7 +2673,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, S.prototype.generateHTMLBody = function() {
 		var a = "",
@@ -3248,7 +3256,7 @@
 					name: "data-id",
 					value: this.guid
 				}],
-				childs: [this.generateHTMLToolTip(), this.generateHTMLHeader()]
+				childs: [this.generateHTMLCommentBubble(), this.generateHTMLHeader()]
 			},
 			c = null,
 			d = 0,
@@ -3837,7 +3845,7 @@
 					name: "data-id",
 					value: this.guid
 				}],
-				childs: [this.generateHTMLToolTip(), this.generateHTMLHeader()]
+				childs: [this.generateHTMLCommentBubble(), this.generateHTMLHeader()]
 			}, this.overrideConnectorTypeForPins(), a = this.generateHTMLBody(), Array.isArray(a))
 			for (b = a.length; f < b; ++f) e.childs.push(a[f]);
 		else e.childs.push(a);
@@ -4026,7 +4034,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, bj.prototype.generateHTMLBody = function() {
 		return {
@@ -4064,7 +4072,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, bb.prototype.generateHTMLBody = function() {
 		var a, b, c = "",
@@ -4159,7 +4167,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, V.prototype.generateHTMLBody = function() {
 		return {
@@ -4202,7 +4210,7 @@
 				name: "data-id",
 				value: this.guid
 			}],
-			childs: [this.generateHTMLToolTip(), this.generateHTMLBody()]
+			childs: [this.generateHTMLCommentBubble(), this.generateHTMLBody()]
 		}
 	}, W.prototype.generateHTMLBody = function() {
 		var a = this.getVariableType();
